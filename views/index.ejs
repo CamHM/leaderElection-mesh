@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <style>
+        body { margin: 2.5%; }
+    </style>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        let socket = io();
+        socket.on('status', (message) => {
+            let content = document.createTextNode(message);
+            let li = document.createElement("li"); //Creacion de un elemento li
+            li.className = "list-group-item"; //Asignacion de la clase a li (Bootstrap)
+            //li.appendChild(content); //asignacion de contenido
+            //li.value = message;
+            li.appendChild(content);
+            document.getElementById('log-list').appendChild(li); //se agrega li al log con el mensaje del servidor
+        });
+        function giveUp() {
+            socket.emit('giveup', 'Renuncio');
+            console.log('ssss');
+        }
+    </script>
+</head>
+<body>
+<div>
+    <h3 id="leader">Servidor id: <%= id%></h3><br>
+    <h3 id="leader">Líder id: <%= idLeader%></h3><br>
+    <% if (id === idLeader) { %>
+        <form>
+            <button type="button" class="btn btn-warning" onclick="giveUp()">Renunciar</button>
+        </form>
+    <% } %>
+    <p id="status"></p>
+    <h2>Log</h2>
+    <ul class="list-group" id="log-list"></ul>
+</div>
+</body>
+</html>

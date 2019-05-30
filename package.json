@@ -1,0 +1,14 @@
+{
+  "name": "Topología malla",
+  "version": "1.0.0",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "ejs": "^2.6.1",
+    "express": "latest",
+    "morgan": "^1.9.1",
+    "socket.io": "^2.2.0"
+  },
+  "scripts": {}
+}
