@@ -13,20 +13,24 @@
             let content = document.createTextNode(message);
             let li = document.createElement("li"); //Creacion de un elemento li
             li.className = "list-group-item"; //Asignacion de la clase a li (Bootstrap)
-            //li.appendChild(content); //asignacion de contenido
-            //li.value = message;
             li.appendChild(content);
             document.getElementById('log-list').appendChild(li); //se agrega li al log con el mensaje del servidor
         });
         socket.on('newLeader', (message) => {
-            console.log(message);
             document.getElementById('leader').innerHTML = `Líder id: ${message}`;
-            document.getElementById('main').innerHTML = 
-                <% if (id === idLeader) { %>
-                    <form>
-                        <button type="button" class="btn btn-warning" onclick="giveUp()">Renunciar</button>
-                    </form>
-                <% } %>;
+            /*
+            if (message.id === message.idLeader) {
+                console.log(message.id + " - " + message.idLeader);
+                let content = document.createTextNode('Renunciar');
+                let button = document.createElement("button"); //Creacion de un elemento de tipo button
+                button.className = "btn btn-warning"; //Asignacion de la clase a button (Bootstrap)
+                button.appendChild(content);
+                document.getElementById('main').innerHTML = '';
+                document.getElementById('main').appendChild(button);
+            } else {
+                document.getElementById('main').innerHTML = '';
+            }
+             */
         });
         socket.on('disconnect', () => {
             socket.close();
@@ -43,9 +47,7 @@
     <h3 id="leader">Líder id: <%= idLeader%></h3><br>
     <div id="main">
         <% if (id === idLeader) { %>
-            <form>
-                <button type="button" class="btn btn-warning" onclick="giveUp()">Renunciar</button>
-            </form>
+            <button type="button" class="btn btn-warning" onclick="giveUp()">Renunciar</button>
         <% } %>
     </div>
     <h2>Log</h2>

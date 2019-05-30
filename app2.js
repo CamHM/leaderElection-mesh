@@ -56,23 +56,26 @@ app.post('/newLeader', (req, res) => {      //Recepción del id del nuevo líder
     idLeader = req.body.idLeader;
     res.send('ok');
     io.emit('newLeader', idLeader);     //Le dice al index.ejs que actualice su información del id del líder
+    checkLeader();
 });
 
 function checkLeader() {        //Chequeo de salud del líder
-    axios.post(servers.get(idLeader)+'/check', {id})
-        .then( res => {
-            if (res.data.serverStatus === 'ok'){
-                sendMessage(`Chequeo al servidor ${idLeader}: ${res.data.serverStatus}`);
-                setTimeout(checkLeader, 10000); //Si el líder responde 'ok' volverá a chequearlo en 10 segundos
-            }else {
-                sendMessage(`El servidor ${idLeader} responde: ${res.data.serverStatus} ....
+    if(id !== idLeader){
+        axios.post(servers.get(idLeader)+'/check', {id})
+            .then( res => {
+                if (res.data.serverStatus === 'ok'){
+                    sendMessage(`Chequeo al servidor ${idLeader}: ${res.data.serverStatus}`);
+                    setTimeout(checkLeader, 5000); //Si el líder responde 'ok' volverá a chequearlo en 10 segundos
+                }else {
+                    sendMessage(`El servidor ${idLeader} responde: ${res.data.serverStatus} ....
                     Empezando proceso de selección de coordinador...`);
-                setTimeout(askCoor, 5000);      //Si la respuesta del líder es negativa, el servidor pregunta a los demás servidores de la red si alguno es coordinador
-            }
-        })
-        .catch(error => {
-            sendMessage(`Error en el chequeo: ${error}`); //En caso de ocurrir algún error, este se reporta en el indec.ejs
-        })
+                    askCoor();      //Si la respuesta del líder es negativa, el servidor pregunta a los demás servidores de la red si alguno es coordinador
+                }
+            })
+            .catch(error => {
+                sendMessage(`Error en el chequeo: ${error}`); //En caso de ocurrir algún error, este se reporta en el indec.ejs
+            })
+    }
 }
 
 function askCoor() {        //Preguntar si algún servidor ya es coordinador de elección
@@ -80,7 +83,7 @@ function askCoor() {        //Preguntar si algún servidor ya es coordinador de 
         axios.post(value+'/isCoor', {id})   //Pregunta a cada servidor que tiene enlazado si ya es coordinador
             .then(res => {
                 console.log(res.data);
-                if (res.data.isCoor === true) {      //Si ya hay alguien..
+                if (res.data.isCoor === 'true') {      //Si ya hay alguien..
                     sendMessage(`El coordinador ya es ${key}`);     //notifica en el index..
                     return true;        // Deja de preguntar y sale del método
                 }else {
@@ -91,7 +94,7 @@ function askCoor() {        //Preguntar si algún servidor ya es coordinador de 
                 sendMessage(`Error al solicitar isCoor: ${error}`);
             });
     });
-    setTimeout(startElection, 5000);    //En caso de que ninguno responda que es coordinador, el servidor asume esta posición y empieza la elección
+    startElection();    //En caso de que ninguno responda que es coordinador, el servidor asume esta posición y empieza la elección
 }
 
 function startElection() {
