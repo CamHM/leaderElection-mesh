@@ -42,7 +42,7 @@ function checkLeader() {
                 sendMessage(`Chequeo al servidor ${idLeader}: ${res.data.serverStatus}`);
                 setTimeout(checkLeader, 10000);
             }else {
-                sendMessage(`El servidor ${idLeader} responde: ${res.data} ....
+                sendMessage(`El servidor ${idLeader} responde: ${res.data.serverStatus} ....
                     Empezando proceso de elección...`);
             }
         })

@@ -24,23 +24,24 @@ server.listen(3002, function () {
 
 app.get('/', function (req, res) {
     res.render('index',
-        {id, idLeader
+        {id,
+        idLeader
         });
 });
 
-app.get('/check', (req, res) => {
+app.post('/check', (req, res) => {
     sendMessage(`Respondiendo chequeo - solicitud enviada por ${req.body.id}`);
     res.send({serverStatus: status});
 });
 
 function checkLeader() {
-    axios.post(servers.get(idLeader)+'/check', {id})
+    axios.post(servers.get(idLeader)+'/check')
         .then( res => {
             if (res.data.serverStatus === 'ok'){
                 sendMessage(`Chequeo al servidor ${idLeader}: ${res.data.serverStatus}`);
-                setTimeout(checkLeader, 15000);
+                setTimeout(checkLeader, 10000);
             }else {
-                sendMessage(`El servidor ${idLeader} responde: ${res.data} ....
+                sendMessage(`El servidor ${idLeader} responde: ${res.data.serverStatus} ....
                     Empezando proceso de elección...`);
             }
         })
@@ -53,6 +54,16 @@ function sendMessage(message) {
     io.emit('status', message);
     console.log(`Mensaje enviado - ${message}`);
 }
+
+io.on('connection', function(socket){
+    console.log('Se conectó alguien');
+    socket.on('giveup', function (message) {
+        status = 'fail';
+        isParticipant = false;
+        isCoor = false;
+        sendMessage(`${message} a ser líder`);
+    });
+});
 
 setTimeout(checkLeader, 5000);
 
