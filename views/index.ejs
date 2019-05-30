@@ -18,15 +18,22 @@
             li.appendChild(content);
             document.getElementById('log-list').appendChild(li); //se agrega li al log con el mensaje del servidor
         });
+        socket.on('newLeader', (message) => {
+            console.log(message);
+            document.getElementById('leader').innerHTML = 'Líder id: <%= idLeader%>';
+        });
+        socket.on('disconnect', () => {
+            socket.close();
+            console.log('Conexión del socket cerrada');
+        });
         function giveUp() {
             socket.emit('giveup', 'Renuncio');
-            console.log('ssss');
         }
     </script>
 </head>
 <body>
 <div>
-    <h3 id="leader">Servidor id: <%= id%></h3><br>
+    <h3 id="myId">Servidor id: <%= id%></h3><br>
     <h3 id="leader">Líder id: <%= idLeader%></h3><br>
     <% if (id === idLeader) { %>
         <form>
