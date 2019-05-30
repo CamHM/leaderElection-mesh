@@ -35,8 +35,12 @@ app.post('/check', (req, res) => {
     res.send({serverStatus: status});
 });
 
+app.get('/isCoor', (req, res) => {
+    res.send({isCoor});
+});
+
 function checkLeader() {
-    axios.post(servers.get(idLeader)+'/check')
+    axios.post(servers.get(idLeader)+'/check', {id})
         .then( res => {
             if (res.data.serverStatus === 'ok'){
                 sendMessage(`Chequeo al servidor ${idLeader}: ${res.data.serverStatus}`);
