@@ -38,10 +38,10 @@ app.post('/isCoor', (req, res) => {     //Petición para saber si el servidor es
 
 app.post('/election', (req, res) => {       //Petición de proceso de elcción
     if (!isParticipant) {
-        sendMessage(`El servidor ${req.body.id} ha enviado petición de elección. Respuesta: No`);
+        sendMessage(`El servidor ${req.body.id} ha enviado petición de elección - Respuesta: No`);
         res.send({accept: 'no'});   //Si no está participando rechaza la solicitud de elección
     } else {
-        sendMessage(`El servidor ${req.body.id} ha enviado petición de elección. Respuesta: ok`);
+        sendMessage(`El servidor ${req.body.id} ha enviado petición de elección - Respuesta: ok`);
         res.send({accept: 'ok'});   //Si está participando acepta la solicitud de elección
     }
 });
@@ -63,11 +63,11 @@ function checkLeader() {        //Chequeo de salud del líder
         .then( res => {
             if (res.data.serverStatus === 'ok'){
                 sendMessage(`Chequeo al servidor ${idLeader}: ${res.data.serverStatus}`);
-                setTimeout(checkLeader, 15000); //Si el líder responde 'ok' volverá a chequearlo en 15 segundos
+                setTimeout(checkLeader, 10000); //Si el líder responde 'ok' volverá a chequearlo en 10 segundos
             }else {
                 sendMessage(`El servidor ${idLeader} responde: ${res.data.serverStatus} ....
                     Empezando proceso de selección de coordinador...`);
-                askCoor();      //Si la respuesta del líder es negativa, el servidor pregunta a los demás servidores de la red si alguno es coordinador
+                setTimeout(askCoor, 5000);      //Si la respuesta del líder es negativa, el servidor pregunta a los demás servidores de la red si alguno es coordinador
             }
         })
         .catch(error => {
@@ -80,7 +80,7 @@ function askCoor() {        //Preguntar si algún servidor ya es coordinador de 
         axios.post(value+'/isCoor', {id})   //Pregunta a cada servidor que tiene enlazado si ya es coordinador
             .then(res => {
                 console.log(res.data);
-                if (res.data === true) {      //Si ya hay alguien..
+                if (res.data.isCoor === true) {      //Si ya hay alguien..
                     sendMessage(`El coordinador ya es ${key}`);     //notifica en el index..
                     return true;        // Deja de preguntar y sale del método
                 }else {
@@ -91,7 +91,7 @@ function askCoor() {        //Preguntar si algún servidor ya es coordinador de 
                 sendMessage(`Error al solicitar isCoor: ${error}`);
             });
     });
-    startElection();    //En caso de que ninguno responda que es coordinador, el servidor asume esta posición y empieza la elección
+    setTimeout(startElection, 5000);    //En caso de que ninguno responda que es coordinador, el servidor asume esta posición y empieza la elección
 }
 
 function startElection() {
@@ -116,6 +116,7 @@ function startElection() {
         if (!response) {
             idLeader = id;
             sendMessage('Seré líder');
+            io.emit('newLeader', idLeader);
             servers.forEach(((value) => {
                 axios.post(value+'/newLeader', {idLeader});  //Se envía actualización de líder a los servidores conectados
             }))

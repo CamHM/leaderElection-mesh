@@ -20,7 +20,13 @@
         });
         socket.on('newLeader', (message) => {
             console.log(message);
-            document.getElementById('leader').innerHTML = 'Líder id: <%= idLeader%>';
+            document.getElementById('leader').innerHTML = `Líder id: ${message}`;
+            document.getElementById('main').innerHTML = 
+                <% if (id === idLeader) { %>
+                    <form>
+                        <button type="button" class="btn btn-warning" onclick="giveUp()">Renunciar</button>
+                    </form>
+                <% } %>;
         });
         socket.on('disconnect', () => {
             socket.close();
@@ -35,12 +41,13 @@
 <div>
     <h3 id="myId">Servidor id: <%= id%></h3><br>
     <h3 id="leader">Líder id: <%= idLeader%></h3><br>
-    <% if (id === idLeader) { %>
-        <form>
-            <button type="button" class="btn btn-warning" onclick="giveUp()">Renunciar</button>
-        </form>
-    <% } %>
-    <p id="status"></p>
+    <div id="main">
+        <% if (id === idLeader) { %>
+            <form>
+                <button type="button" class="btn btn-warning" onclick="giveUp()">Renunciar</button>
+            </form>
+        <% } %>
+    </div>
     <h2>Log</h2>
     <ul class="list-group" id="log-list"></ul>
 </div>
