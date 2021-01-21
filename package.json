@@ -8,7 +8,7 @@
     "ejs": "^2.6.1",
     "express": "latest",
     "morgan": "^1.9.1",
-    "socket.io": "^2.2.0"
+    "socket.io": "^2.4.0"
   },
   "scripts": {}
 }
